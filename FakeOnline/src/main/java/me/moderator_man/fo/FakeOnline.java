@@ -60,6 +60,7 @@ public class FakeOnline extends JavaPlugin
 		getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, handler, Priority.Normal, this);
 		getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT_ENTITY, handler, Priority.Normal, this);
 		getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, handler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.ENTITY_DAMAGE, handler, Priority.Normal, this);
 		
 		File dir1 = new File("fo-data");
 		if (!dir1.exists())
