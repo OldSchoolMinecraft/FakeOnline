@@ -119,12 +119,14 @@ public class FakeOnline extends JavaPlugin
 	
 	public void sendError(CommandSender sender, String msg)
 	{
-		sender.sendMessage(error_prefix + msg);
+		if (sender != null)
+			sender.sendMessage(error_prefix + msg);
 	}
 	
 	public void sendSuccess(CommandSender sender, String msg)
 	{
-		sender.sendMessage(success_prefix + msg);
+		if (sender != null)
+			sender.sendMessage(success_prefix + msg);
 	}
 	
 	public void sendAdminLog(boolean error, String msg)
