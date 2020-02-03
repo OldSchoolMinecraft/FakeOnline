@@ -26,7 +26,8 @@ public class FakeOnline extends JavaPlugin
 	
 	public UserManager um;
 	public ConfigurationManager cm;
-	public PlayerHandler handler;
+	public PlayerHandler playerHandler;
+	public EntityHandler entityHandler;
 	public World world;
 	public CommandManager cmdm;
 	
@@ -46,21 +47,23 @@ public class FakeOnline extends JavaPlugin
 		cmdm.onEnable();
 		cm.load();
 		
-		handler = new PlayerHandler(this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_LOGIN, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_DROP_ITEM, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_PICKUP_ITEM, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_BED_ENTER, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_EMPTY, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_CHAT, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_COMMAND_PREPROCESS, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT_ENTITY, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, handler, Priority.Normal, this);
-		getServer().getPluginManager().registerEvent(Type.ENTITY_DAMAGE, handler, Priority.Normal, this);
+		playerHandler = new PlayerHandler(this);
+		entityHandler = new EntityHandler(this);
+		
+		getServer().getPluginManager().registerEvent(Type.PLAYER_LOGIN, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_DROP_ITEM, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_PICKUP_ITEM, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_BED_ENTER, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_EMPTY, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_BUCKET_FILL, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_CHAT, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_COMMAND_PREPROCESS, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_INTERACT_ENTITY, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_PORTAL, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.ENTITY_DAMAGE, entityHandler, Priority.Normal, this);
 		
 		File dir1 = new File("fo-data");
 		if (!dir1.exists())
@@ -68,6 +71,14 @@ public class FakeOnline extends JavaPlugin
 		else if (!dir1.isDirectory()) {
 			dir1.delete();
 			dir1.mkdir();
+		}
+		
+		File dirip = new File("fo-data/ips");
+		if (!dirip.exists())
+			dirip.mkdir();
+		else if (!dirip.isDirectory()) {
+			dirip.delete();
+			dirip.mkdir();
 		}
 		
 		System.out.println("FakeOnline enabled.");

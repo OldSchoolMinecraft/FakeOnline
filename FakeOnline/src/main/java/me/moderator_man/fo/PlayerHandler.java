@@ -158,18 +158,6 @@ public class PlayerHandler extends PlayerListener
 		}
 	}
 	
-	public void onPlayerDamage(EntityDamageEvent event)
-	{
-		if (event.getEntity() instanceof Player)
-		{
-			Player player = (Player) event.getEntity();
-			if (!fo.um.isAuthenticated(player.getName()) || fo.um.isFrozen(player.getName()))
-			{
-				event.setCancelled(true);
-			}
-		}
-	}
-	
 	public void onPlayerDropItem(PlayerDropItemEvent event)
 	{
 		if (!fo.um.isAuthenticated(event.getPlayer().getName()) || fo.um.isFrozen(event.getPlayer().getName()))
