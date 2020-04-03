@@ -51,6 +51,7 @@ public class FakeOnline extends JavaPlugin
 		entityHandler = new EntityHandler(this);
 		
 		getServer().getPluginManager().registerEvent(Type.PLAYER_LOGIN, playerHandler, Priority.Normal, this);
+		getServer().getPluginManager().registerEvent(Type.PLAYER_PRELOGIN, playerHandler, Priority.Normal, this);
 		getServer().getPluginManager().registerEvent(Type.PLAYER_QUIT, playerHandler, Priority.Normal, this);
 		getServer().getPluginManager().registerEvent(Type.PLAYER_MOVE, playerHandler, Priority.Normal, this);
 		getServer().getPluginManager().registerEvent(Type.PLAYER_DROP_ITEM, playerHandler, Priority.Normal, this);
