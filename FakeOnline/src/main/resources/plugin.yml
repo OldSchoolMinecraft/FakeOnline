@@ -18,3 +18,6 @@ commands:
     createaccount:
         description: Create an account
         usage: /createaccount <username> <password>
+    authinfo:
+        description: Get authentication information about a player
+        usage: /authinfo <username>

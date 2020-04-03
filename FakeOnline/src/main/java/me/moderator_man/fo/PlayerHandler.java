@@ -81,6 +81,7 @@ public class PlayerHandler extends PlayerListener {
                 if (res.getString("response").equalsIgnoreCase("yes")) {
                     if (fo.cm.getBoolean("log-successful-auths", true))
                         logAuth(false, String.format("Authenticated user: '%s'.", name));
+                    fo.um.put_userHasSession(name);
                     event.allow();
                     fo.um.authenticateUser(name);
                     if (fo.um.isRegistered(name)) {

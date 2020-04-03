@@ -1,10 +1,10 @@
 package me.moderator_man.fo.cmd;
 
 import me.moderator_man.fo.AliasMap;
+import me.moderator_man.fo.cmd.commands.AuthInfo;
 import me.moderator_man.fo.cmd.commands.ChangePassword;
 import me.moderator_man.fo.cmd.commands.DeleteAccount;
 import me.moderator_man.fo.cmd.commands.Login;
-import me.moderator_man.fo.cmd.commands.PlayerInfo;
 import me.moderator_man.fo.cmd.commands.Register;
 
 public class CommandManager
@@ -25,7 +25,7 @@ public class CommandManager
 		
 		// admin only
 		register("deleteaccount", new DeleteAccount(), "delacc");
-		register("playerinfo", new PlayerInfo(), "pinfo", "pi");
+		register("authinfo", new AuthInfo(), "ainfo", "ai");
 	}
 	
 	public void register(String realKey, Command command, String...aliases)
