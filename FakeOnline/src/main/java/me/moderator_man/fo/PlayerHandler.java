@@ -2,8 +2,6 @@ package me.moderator_man.fo;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.CraftServer;
-import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityTargetEvent;
@@ -16,26 +14,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 public class PlayerHandler extends PlayerListener {
     private FakeOnline fo;
-    private HashMap<String, String> betaEVO = new HashMap<String, String>();
-    private HashMap<String, String> userIP = new HashMap<String, String>();
 
     public PlayerHandler(FakeOnline fo) {
         this.fo = fo;
     }
 
     public void onPlayerPreLogin(PlayerPreLoginEvent event) {
-        System.out.println(event.getAddress().getHostAddress());
-        if(userIP.containsKey(event.getName().toLowerCase())) {
-            userIP.remove(event.getName().toLowerCase());
-        }
-        userIP.put(event.getName(), event.getAddress().getHostAddress());
-
-        if (betaEVO.containsKey(event.getName())) {
-            betaEVO.remove(event.getName());
+        final String username = event.getName().toLowerCase();
+        if(fo.getBetaEVOAuth().contains(username)) {
+            fo.getBetaEVOAuth().remove(username);
         }
 
         //Add connection pause
@@ -49,7 +40,8 @@ public class PlayerHandler extends PlayerListener {
                     if (res.has("verified")) {
                         if (res.get("verified").equals(true)) {
                             //User is verified
-                            betaEVO.put(event.getName(), event.getAddress().getHostAddress());
+                            System.out.println(event.getName() + " Has been authenticated with Beta Evolutions");
+                            fo.getBetaEVOAuth().add(username);
                         }
                     }
                     event.getLoginProcessHandler().removeConnectionPause(fo);
@@ -71,9 +63,8 @@ public class PlayerHandler extends PlayerListener {
         try {
             Player player = event.getPlayer();
             String name = player.getName();
-            String ip = userIP.get(event.getPlayer().getName().toLowerCase());
 
-            if (betaEVO.containsKey(name) && betaEVO.get(name).equalsIgnoreCase(ip)) {
+            if(fo.getBetaEVOAuth().contains(name.toLowerCase())) {
                 if (fo.um.isRegistered(name)) {
                     logAuth(false, String.format("Authenticated user: '%s' with Beta Evolutions.", name));
                     event.allow();
@@ -81,7 +72,6 @@ public class PlayerHandler extends PlayerListener {
                     return;
                 }
             }
-
 
             String serverHash = fo.hash(fo.getServer().getIp() + fo.getServer().getPort());
             JSONObject res = new JSONObject(get(String.format("http://api.oldschoolminecraft.com:8080/checkserver?username=%s&serverHash=%s", name, serverHash)));

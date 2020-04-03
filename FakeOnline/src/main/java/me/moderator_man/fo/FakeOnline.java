@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -30,6 +31,7 @@ public class FakeOnline extends JavaPlugin
 	public EntityHandler entityHandler;
 	public World world;
 	public CommandManager cmdm;
+	private ArrayList<String> betaEVOAuth = new ArrayList<String>();
 	
 	public void onEnable()
 	{
@@ -220,7 +222,11 @@ public class FakeOnline extends JavaPlugin
 		
 		System.out.println("FakeOnline disabled.");
 	}
-	
+
+	public ArrayList<String> getBetaEVOAuth() {
+		return betaEVOAuth;
+	}
+
 	public UserManager getUserManager()
 	{
 		return um;
