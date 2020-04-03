@@ -1,6 +1,7 @@
 package me.moderator_man.fo;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -86,8 +87,10 @@ public class PlayerHandler extends PlayerListener {
                 }
             }
 
-            String serverHash = fo.hash(fo.getServer().getIp() + fo.getServer().getPort());
             //JSONObject res = new JSONObject(get(String.format("http://api.oldschoolminecraft.com:8080/checkserver?username=%s&serverHash=%s", name, serverHash)));
+            if(!fo.getOSMResponse().containsValue(name)) {
+                event.disallow(Result.KICK_OTHER, ChatColor.RED + "FakeOnline Error, Please Rejoin");
+            }
             JSONObject res = fo.getOSMResponse().get(name);
             if (res.has("error")) {
                 event.disallow(Result.KICK_OTHER, res.getString("error"));
