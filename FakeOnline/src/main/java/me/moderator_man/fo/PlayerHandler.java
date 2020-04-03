@@ -14,7 +14,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 
 public class PlayerHandler extends PlayerListener {
     private FakeOnline fo;
@@ -24,38 +23,52 @@ public class PlayerHandler extends PlayerListener {
     }
 
     public void onPlayerPreLogin(PlayerPreLoginEvent event) {
-        final String username = event.getName().toLowerCase();
-        if(fo.getBetaEVOAuth().contains(username)) {
+        final String username = event.getName();
+        final String serverHash = fo.hash(fo.getServer().getIp() + fo.getServer().getPort());
+
+        //Remove previous BetaEVO auths
+        if (fo.getBetaEVOAuth().contains(username)) {
             fo.getBetaEVOAuth().remove(username);
+        }
+        //Remove previous OSM auths
+        if(fo.getOSMResponse().containsKey(username)) {
+            fo.getOSMResponse().remove(username);
         }
 
         //Add connection pause
         try {
-            //Connection pause for Beta Evolutions Support
             event.getLoginProcessHandler().addConnectionPause(fo);
-            final String url = "https://auth.johnymuffin.com/serverAuth.php?method=1&username=" + URLEncoder.encode(event.getName(), "UTF-8") + "&userip=" + URLEncoder.encode(event.getAddress().getHostAddress(), "UTF-8");
+            final String OSMURL = String.format("http://api.oldschoolminecraft.com:8080/checkserver?username=%s&serverHash=%s", username, serverHash);
+            final String EVOURL = "https://auth.johnymuffin.com/serverAuth.php?method=1&username=" + URLEncoder.encode(event.getName(), "UTF-8") + "&userip=" + URLEncoder.encode(event.getAddress().getHostAddress(), "UTF-8");
             Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(fo, () -> {
-                final JSONObject res = new JSONObject(get(url));
+                final JSONObject OSMAPI = new JSONObject(get(OSMURL));
                 Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(fo, () -> {
-                    if (res.has("verified")) {
-                        if (res.get("verified").equals(true)) {
-                            //User is verified
-                            System.out.println(event.getName() + " Has been authenticated with Beta Evolutions");
-                            fo.getBetaEVOAuth().add(username);
-                        }
+                    if (OSMAPI.has("error")) {
+                        event.getLoginProcessHandler().cancelLoginProcess(OSMAPI.getString("error"));
+                        event.getLoginProcessHandler().removeConnectionPause(fo);
+                        return;
                     }
-                    event.getLoginProcessHandler().removeConnectionPause(fo);
-                }, 0L);
-            }, 0L);
+                    fo.getOSMResponse().put(username, OSMAPI);
+                    Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(fo, () -> {
+                        final JSONObject EVOAPI = new JSONObject(get(EVOURL));
+                        Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(fo, () -> {
+                            if (EVOAPI.has("verified")) {
+                                if (EVOAPI.get("verified").equals(true)) {
+                                    //User is verified
+                                    System.out.println(event.getName() + " Has been authenticated with Beta Evolutions");
+                                    fo.getBetaEVOAuth().add(username);
+                                }
+                            } else {
+                                System.out.println("BetaEVO has had an error.");
+                            }
 
-
+                            event.getLoginProcessHandler().removeConnectionPause(fo);
+                        });
+                    });
+                });
+            });
         } catch (Exception e) {
-            System.out.println("Beta Evolutions Failure :(" + e + ": " + e.getMessage());
-            Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(fo, () -> {
-                event.getLoginProcessHandler().removeConnectionPause(fo);
-            }, 0L);
-
-
+            System.out.println("Error creating a connection pause: " + e + ": " + e.getMessage());
         }
     }
 
@@ -64,7 +77,7 @@ public class PlayerHandler extends PlayerListener {
             Player player = event.getPlayer();
             String name = player.getName();
 
-            if(fo.getBetaEVOAuth().contains(name.toLowerCase())) {
+            if (fo.getBetaEVOAuth().contains(name)) {
                 if (fo.um.isRegistered(name)) {
                     logAuth(false, String.format("Authenticated user: '%s' with Beta Evolutions.", name));
                     event.allow();
@@ -74,7 +87,8 @@ public class PlayerHandler extends PlayerListener {
             }
 
             String serverHash = fo.hash(fo.getServer().getIp() + fo.getServer().getPort());
-            JSONObject res = new JSONObject(get(String.format("http://api.oldschoolminecraft.com:8080/checkserver?username=%s&serverHash=%s", name, serverHash)));
+            //JSONObject res = new JSONObject(get(String.format("http://api.oldschoolminecraft.com:8080/checkserver?username=%s&serverHash=%s", name, serverHash)));
+            JSONObject res = fo.getOSMResponse().get(name);
             if (res.has("error")) {
                 event.disallow(Result.KICK_OTHER, res.getString("error"));
             } else {

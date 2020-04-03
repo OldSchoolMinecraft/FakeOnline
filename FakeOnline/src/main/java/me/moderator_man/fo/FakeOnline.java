@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -20,6 +21,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import me.moderator_man.fo.cmd.CommandManager;
 import me.moderator_man.fo.config.ConfigurationManager;
 import me.moderator_man.fo.user.UserManager;
+import org.json.JSONObject;
 
 public class FakeOnline extends JavaPlugin
 {
@@ -32,6 +34,7 @@ public class FakeOnline extends JavaPlugin
 	public World world;
 	public CommandManager cmdm;
 	private ArrayList<String> betaEVOAuth = new ArrayList<String>();
+	private HashMap<String, JSONObject> OSMResponse = new HashMap<String, JSONObject>();
 	
 	public void onEnable()
 	{
@@ -225,6 +228,10 @@ public class FakeOnline extends JavaPlugin
 
 	public ArrayList<String> getBetaEVOAuth() {
 		return betaEVOAuth;
+	}
+
+	public HashMap<String, JSONObject> getOSMResponse() {
+		return OSMResponse;
 	}
 
 	public UserManager getUserManager()
